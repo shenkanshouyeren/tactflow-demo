@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>TactFlow · 出海合规检查</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.6;padding:16px;padding-bottom:80px}
+.hero{text-align:center;padding:32px 0 24px;border-bottom:1px solid #21262d}
+.hero h1{font-size:22px;color:#f0f6fc;font-weight:700;line-height:1.3;margin-bottom:8px}
+.hero h2{font-size:14px;color:#8b949e;font-weight:400}
+.hero .badge{display:inline-block;background:#1f6feb33;color:#58a6ff;padding:4px 12px;border-radius:12px;font-size:12px;margin-top:12px}
+.section{margin-top:24px}
+.section-title{font-size:16px;color:#f0f6fc;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title .icon{width:20px;height:20px;background:#4ecdc4;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#0d1117}
+.card{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:16px;margin-bottom:16px}
+.country-selector{display:flex;gap:8px;margin-bottom:12px}
+.country-btn{padding:8px 16px;border:2px solid #21262d;border-radius:8px;background:#161b22;color:#c9d1d9;font-size:14px;cursor:pointer;transition:all .2s}
+.country-btn.active{border-color:#4ecdc4;color:#4ecdc4;background:#4ecdc415}
+.country-btn:active{transform:scale(.95)}
+textarea{width:100%;min-height:120px;background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px;color:#c9d1d9;font-size:14px;resize:vertical;font-family:inherit}
+textarea:focus{border-color:#4ecdc4;outline:none}
+.sample-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.sample-btn{padding:6px 12px;background:#21262d;border:none;border-radius:6px;color:#8b949e;font-size:12px;cursor:pointer}
+.sample-btn:active{background:#4ecdc4;color:#0d1117}
+.process-btn{width:100%;padding:14px;background:#4ecdc4;color:#0d1117;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:12px;transition:all .2s}
+.process-btn:active{background:#3ba8a0;transform:scale(.98)}
+.process-btn:disabled{background:#21262d;color:#484f58;cursor:not-allowed}
+.model-select{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.model-opt{padding:4px 8px;background:#0d1117;border:1px solid #21262d;border-radius:4px;color:#8b949e;font-size:11px;cursor:pointer}
+.model-opt.active{border-color:#58a6ff;color:#58a6ff}
+.loading{text-align:center;padding:24px;color:#8b949e}
+.loading .spinner{display:inline-block;width:24px;height:24px;border:2px solid #21262d;border-top-color:#4ecdc4;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}
+}
+.error{background:#3d1114;border:1px solid #ff6b6b;border-radius:8px;padding:12px;color:#ff6b6b;font-size:14px;margin-top:12px}
+.compare{display:flex;gap:8px;overflow:hidden}
+.compare-col{flex:1;min-width:0}
+.compare-label{font-size:11px;color:#8b949e;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.compare-label .dot{width:8px;height:8px;border-radius:50%}
+.compare-label .dot.red{background:#ff6b6b}
+.compare-label .dot.green{background:#4ecdc4}
+.compare-text{background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:12px;font-size:13px;word-break:break-all;min-height:80px;white-space:pre-wrap}
+.risk-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600}
+.risk-badge.high{background:#ff6b6b22;color:#ff6b6b}
+.risk-badge.medium{background:#d2992222;color:#d29922}
+.risk-badge.low{background:#4ecdc422;color:#4ecdc4}
+.field-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.field-table th{text-align:left;color:#8b949e;padding:6px 4px;border-bottom:1px solid #21262d;font-weight:400}
+.field-table td{padding:6px 4px;border-bottom:1px solid #21262d;color:#c9d1d9}
+.field-table td:first-child{color:#f0f6fc;font-weight:500}
+.score-gauge{text-align:center;padding:16px}
+.score-ring{width:80px;height:80px;border-radius:50%;border:4px solid #21262d;display:inline-flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#f0f6fc;margin-bottom:8px}
+.score-ring.safe{border-color:#4ecdc4;color:#4ecdc4}
+.score-ring.warning{border-color:#d29922;color:#d29922}
+.score-ring.danger{border-color:#ff6b6b;color:#ff6b6b}
+.score-label{font-size:12px;color:#8b949e}
+.summary{font-size:14px;color:#c9d1d9;padding:8px 0;border-top:1px solid #21262d;margin-top:12px;line-height:1.5}
+.cta{text-align:center;padding:32px 0;margin-top:24px;border-top:1px solid #21262d}
+.cta h3{font-size:18px;color:#f0f6fc;font-weight:600;margin-bottom:8px}
+.cta p{font-size:14px;color:#8b949e;margin-bottom:16px}
+.cta-btn{display:inline-block;padding:12px 24px;background:#1f6feb;color:#f0f6fc;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none}
+.hidden{display:none}
+.footer{text-align:center;padding:16px;color:#484f58;font-size:11px;border-top:1px solid #21262d;margin-top:24px}
+.tech-toggle{color:#484f58;font-size:11px;text-decoration:none;cursor:pointer;border-bottom:1px dashed #484f58}
+.tech-toggle:hover{color:#58a6ff}
+.tech-section{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:12px;margin-top:8px;font-size:11px;color:#8b949e;line-height:1.8}
+.tech-section .label{color:#ff6b6b;font-weight:500}
+.tech-section .value{color:#4ecdc4}
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+<h1>30万罚了，因为门有锁你没钥匙。<br>试试这把。</h1>
+<h2>输入你的业务文本 → 选择目标国家 → 看它变安全</h2>
+<div class="badge">TactFlow · 出海合规检查 · 中/新两国</div>
+</div>
+
+<!-- ==================== INPUT ==================== -->
+<div class="section">
+<div class="section-title"><span class="icon">1</span> 输入业务文本</div>
+<div class="card">
+<div class="country-selector">
+<button class="country-btn active" data-country="CN" onclick="selectCountry('CN')">🇨🇳 中国 · 个人信息保护</button>
+<button class="country-btn" data-country="SG" onclick="selectCountry('SG')">🇸🇬 新加坡 · 个人数据保护</button>
+</div>
+<textarea id="inputText" placeholder="粘贴包含敏感信息的业务文本…&#10;&#10;例如：张三，身份证310101199001011234，手机13812345678"></textarea>
+<div class="sample-btns">
+<button class="sample-btn" onclick="loadSample('CN')">📌 中国示例</button>
+<button class="sample-btn" onclick="loadSample('SG')">📌 新加坡示例</button>
+<button class="sample-btn" onclick="clearInput()">✖ 清空</button>
+</div>
+<div class="model-select">
+<span style="font-size:11px;color:#8b949e">模型：</span>
+<button class="model-opt active" data-model="deepseek/deepseek-v4-flash" onclick="selectModel(this)">快速模式</button>
+<button class="model-opt" data-model="deepseek/deepseek-v3.2-251201" onclick="selectModel(this)">稳定模式</button>
+</div>
+<button class="process-btn" id="processBtn" onclick="processText()">▶ 开始检查</button>
+</div>
+</div>
+
+<!-- ==================== RESULTS ==================== -->
+<div class="section hidden" id="resultsSection">
+<div class="section-title"><span class="icon">2</span> 检查结果</div>
+
+<!-- Score Gauge -->
+<div class="card">
+<div class="score-gauge">
+<div class="score-ring" id="scoreRing">--</div>
+<div class="score-label" id="scoreLabel">合规风险评分</div>
+</div>
+</div>
+
+<!-- Comparison -->
+<div class="card">
+<div class="compare">
+<div class="compare-col">
+<div class="compare-label"><span class="dot red"></span> 原始文本</div>
+<div class="compare-text" id="originalDisplay">-</div>
+</div>
+<div class="compare-col">
+<div class="compare-label"><span class="dot green"></span> 脱敏后文本</div>
+<div class="compare-text" id="desensitizedDisplay">-</div>
+</div>
+</div>
+</div>
+
+<!-- Field Breakdown -->
+<div class="card">
+<div class="section-title" style="margin-bottom:8px">处理明细</div>
+<table class="field-table" id="fieldTable">
+<thead><tr><th>字段</th><th>原始值</th><th>脱敏值</th><th>策略</th><th>风险</th></tr></thead>
+<tbody id="fieldBody"></tbody>
+</table>
+</div>
+
+<!-- Summary -->
+<div class="card">
+<div class="summary" id="riskSummary">-</div>
+</div>
+</div>
+
+<!-- Loading -->
+<div class="section hidden" id="loadingSection">
+<div class="loading">
+<div class="spinner"></div>
+<div>正在检查中…</div>
+</div>
+</div>
+
+<!-- Error -->
+<div class="hidden" id="errorSection"></div>
+
+<!-- ==================== CTA ==================== -->
+<div class="cta">
+<h3>想把这把钥匙装进你的系统？</h3>
+<p>TactFlow · 出海合规检查 · 多国法规适配</p>
+<a class="cta-btn" href="mailto:contact@tactflow.dev">聊聊你的船 →</a>
+</div>
+
+<!-- ==================== TECH TOGGLE ==================== -->
+<div class="footer">
+TactFlow · 出海合规检查<br>
+<a class="tech-toggle" onclick="toggleTech()">技术视角 ▼</a>
+<div class="tech-section hidden" id="techSection">
+<span class="label">国家规则</span>：CN → 中国PIPL(个人信息保护法)；SG → 新加坡PDPA(个人数据保护法)<br>
+<span class="label">模型选项</span>：快速模式 → DeepSeek-V4-Flash(0.1×算力/最省Token)；稳定模式 → DeepSeek-V3.2(0.3×算力/更稳定)<br>
+<span class="label">核心功能</span>：合规路由引擎(compliance routing) → 4级脱敏策略体系(REDACT/MASK/HASH/TOKENIZE)<br>
+<span class="label">产品定位</span>：TactFlow合规网关中间件 · API化实时路由 · B2B2C飞轮 · 亚太区出海合规准入门槛<br>
+<span class="label">技术架构</span>：前端HTML → 七牛云函数计算代理 → 七牛云AI API(DeepSeek) → 结构化合规分析输出<br>
+<span class="label">演示范围</span>：1端点POST /v1/data/process · 2国CN/SG · 4级脱敏 · 手机Safari可展示
+</div>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+// ===== CONFIG =====
+// ⚠️ 部署后替换为你的七牛云函数计算代理URL
+const PROXY_URL = 'YOUR_PROXY_URL_HERE'; // 例：https://xxx.qiniu.com/api/compliance
+let selectedCountry = 'CN';
+let selectedModel = 'deepseek/deepseek-v4-flash';
+
+// ===== SAMPLE DATA =====
+const SAMPLES = {
+  CN: '客户信息：张三，身份证号310101199001011234，手机号13812345678，邮箱zhangsan@example.com，住址上海市浦东新区陆家嘴环路1000号，银行卡号6222021234567890123。订单备注：该客户于2025年6月15日下单购买跨境SaaS服务，目标市场韩国。',
+  SG: 'Customer record: John Tan, NRIC S1234567A, mobile +65-9123-4567, email john.tan@example.com, address 123 Orchard Road, Singapore 238858. Note: This customer subscribed to our cross-border data analytics SaaS on 2025-06-15, targeting the Malaysian market.'
+};
+
+// ===== UI FUNCTIONS =====
+function toggleTech() {
+  const s = document.getElementById('techSection');
+  s.classList.toggle('hidden');
+  const link = document.querySelector('.tech-toggle');
+  link.textContent = s.classList.contains('hidden') ? '技术视角 ▼' : '技术视角 ▲';
+}
+
+function selectCountry(c) {
+  selectedCountry = c;
+  document.querySelectorAll('.country-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.country === c);
+  });
+}
+
+function selectModel(el) {
+  selectedModel = el.dataset.model;
+  document.querySelectorAll('.model-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function loadSample(c) {
+  document.getElementById('inputText').value = SAMPLES[c];
+  selectCountry(c);
+}
+
+function clearInput() {
+  document.getElementById('inputText').value = '';
+  hideResults();
+}
+
+function hideResults() {
+  document.getElementById('resultsSection').classList.add('hidden');
+  document.getElementById('loadingSection').classList.add('hidden');
+  document.getElementById('errorSection').classList.add('hidden');
+}
+
+function showLoading() {
+  document.getElementById('loadingSection').classList.remove('hidden');
+  document.getElementById('resultsSection').classList.add('hidden');
+  document.getElementById('errorSection').classList.add('hidden');
+  document.getElementById('processBtn').disabled = true;
+}
+
+function hideLoading() {
+  document.getElementById('loadingSection').classList.add('hidden');
+  document.getElementById('processBtn').disabled = false;
+}
+
+function showError(msg) {
+  hideLoading();
+  const el = document.getElementById('errorSection');
+  el.innerHTML = `<div class="error">${msg}</div>`;
+  el.classList.remove('hidden');
+}
+
+// ===== MAIN PROCESS =====
+async function processText() {
+  const input = document.getElementById('inputText').value.trim();
+  if (!input) { showError('⚠️ 请先输入业务文本'); return; }
+  if (PROXY_URL === 'YOUR_PROXY_URL_HERE') { showError('⚠️ 代理URL未配置。请在代码中替换YOUR_PROXY_URL_HERE为七牛云函数计算代理URL。'); return; }
+
+  showLoading();
+
+  try {
+    const resp = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: input,
+        country: selectedCountry,
+        model: selectedModel
+      })
+    });
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`API调用失败(${resp.status}): ${errText.substring(0, 200)}`);
+    }
+
+    const data = await resp.json();
+    
+    if (!resp.ok || data.error) {
+      throw new Error(data.error || data.detail || `代理调用失败(${resp.status})`);
+    }
+    
+    // 代理返回格式：{success, original_text, country, model, result, tokens_used}
+    const result = data.result || data;
+
+    displayResults(result, input);
+    hideLoading();
+  } catch (e) {
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+      showError('⚠️ 网络请求失败——请确认代理URL是否正确配置。');
+    } else {
+      showError(`❌ ${e.message}`);
+    }
+    hideLoading();
+  }
+}
+
+// ===== DISPLAY RESULTS =====
+function displayResults(result, originalText) {
+  document.getElementById('resultsSection').classList.remove('hidden');
+
+  // Original text
+  document.getElementById('originalDisplay').textContent = originalText;
+
+  // Desensitized text
+  document.getElementById('desensitizedDisplay').textContent = result.desensitized_text || '-';
+
+  // Score gauge
+  const score = result.compliance_score || 50;
+  const ring = document.getElementById('scoreRing');
+  ring.textContent = score;
+  ring.className = 'score-ring ' + (score >= 70 ? 'safe' : score >= 40 ? 'warning' : 'danger');
+  document.getElementById('scoreLabel').textContent = 
+    score >= 70 ? '合规风险：低 ✓' : score >= 40 ? '合规风险：中 ⚠' : '合规风险：高 ✗';
+
+  // Field breakdown
+  const tbody = document.getElementById('fieldBody');
+  tbody.innerHTML = '';
+  (result.fields || []).forEach(f => {
+    const riskClass = f.risk_level === '高' ? 'high' : f.risk_level === '中' ? 'medium' : 'low';
+    tbody.innerHTML += `<tr>
+      <td>${f.field_type}</td>
+      <td style="font-size:11px">${f.original_value}</td>
+      <td style="font-size:11px;color:#4ecdc4">${f.desensitized_value}</td>
+      <td><span class="risk-badge ${riskClass}">${f.strategy} ${f.strategy_name}</span></td>
+      <td><span class="risk-badge ${riskClass}">${f.risk_level}</span></td>
+    </tr>`;
+  });
+
+  // Summary
+  document.getElementById('riskSummary').textContent = result.risk_summary || '-';
+}
+</script>
+</body>
+</html>
