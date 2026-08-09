@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "proxy_handler.py",
+      "src": "api/compliance.py",
       "use": "@vercel/python"
     }
   ],
