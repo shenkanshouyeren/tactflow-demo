@@ -1,7 +1,5 @@
 {
   "routes": [
-    { "src": "/api/(.*)", "dest": "/proxy_handler.py" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
-
