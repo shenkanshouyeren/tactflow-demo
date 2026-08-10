@@ -1,14 +1,8 @@
 {
   "builds": [
     {
-      "src": "api/compliance.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "api/compliance.py"
+      "src": "index.html",
+      "use": "@vercel/static"
     }
   ]
 }
