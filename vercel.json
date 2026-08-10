@@ -1,8 +1,18 @@
 {
   "builds": [
     {
+      "src": "proxy_handler.py",
+      "use": "@vercel/python"
+    },
+    {
       "src": "index.html",
       "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "proxy_handler.py"
     }
   ]
 }
