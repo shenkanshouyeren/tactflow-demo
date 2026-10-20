@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TactFlow · 개인정보 컴플라이언스 도구</title>
+<style>
+:root{--ink:#1b1b1f;--muted:#6b6b76;--line:#e3e3e8;--bg:#fbfbfd;--acc:#2b4fbd}
+*{box-sizing:border-box} html,body{margin:0;padding:0}
+body{padding:20px 14px 40px;font:15px/1.7 -apple-system,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:20px;margin:0 0 4px;letter-spacing:-.2px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+a.card:hover{border-color:var(--acc)}
+.t{font-size:15px;font-weight:600;margin-bottom:3px}
+.d{font-size:12.5px;color:var(--muted)}
+.frame{width:100%;height:calc(100vh - 40px);border:1px solid var(--line);border-radius:10px;background:#fff}
+.back{display:inline-block;margin-bottom:10px;font-size:13px;color:var(--acc);cursor:pointer;background:#eef1fb;border-radius:20px;padding:5px 14px}
+.foot{margin-top:24px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.9}
+.foot b{color:var(--ink)}
+</style></head><body><div class="wrap">
+<div id="home"><h1>TactFlow · 개인정보 컴플라이언스 도구</h1>
+<p class="sub">한국 PIPA 기준 · PIPC 공식 자료에 근거한 자체점검 도구</p>
+<a class="card" href="javascript:void(0)" onclick="show(0)"><div class="t">AI 개발 안전조치 자체점검</div><div class="d">PIPC 2024.7 · 12개 항목 · 8 기술 / 4 관리</div></a>
+<a class="card" href="javascript:void(0)" onclick="show(1)"><div class="t">과징금 투자감경 증빙 점검</div><div class="d">증빙 8종 · 지표 5개 항목 · 기준금액 산술</div></a>
+<a class="card" href="javascript:void(0)" onclick="show(2)"><div class="t">개인정보 항목 탐지</div><div class="d">서버 전송 없음 · 8종 정규표현식</div></a>
+<div class="foot"><b>세 도구의 공통 원칙</b><br>
+· 산출물은 <b>체크리스트 집계와 단순 산술</b>이며, 법률 의견이 아닙니다.<br>
+· 중대성 등급·감경률은 <b>위원회 재량 사항</b>이므로 도구가 판단하지 않습니다.<br>
+· 각 항목에는 <b>원문 위치</b>를 표시하며, 개별 판단은 변호사가 수행합니다.<br>
+· 원문이 '권고'인 경우 <b>미이행이 곧 위법을 의미하지 않습니다.</b><br>
+· <b>어떤 데이터도 외부로 전송되지 않습니다.</b> 모든 처리는 브라우저 안에서 이루어집니다.<br><br>
+<b>알려진 실패 시나리오（먼저 밝힙니다）</b><br>
+· <b>탐지</b>: 주문번호·송장번호·사업자등록번호 등 <b>긴 숫자열을 개인정보로 오인</b>할 수 있습니다（실측: 419건 회귀에서 계좌번호 오탐 39건 → 기본 미포함）. 전각 숫자는 자동 변환 후 검사합니다. 이미지·PDF 내 번호는 <b>탐지되지 않습니다</b>.<br>
+· <b>자체점검</b>: 12개 항목은 <b>권고</b>이며, 체크는 <b>자기신고</b>입니다. 검증 장치가 없습니다.<br>
+· <b>감경 산술</b>: <b>기준금액까지만</b> 계산합니다. 중대성 등급은 도구가 판정하지 않으며, '관련 없는 매출액'의 진위도 검증하지 않습니다.<br>
+· <b>공통</b>: 근거는 2026-10-20 이전 공개 자료입니다. <b>법령·고시가 개정되면 즉시 무효화</b>될 수 있습니다. 세 도구의 출력은 <b>내부 작업 자료이며, 법정 제출 문서가 아닙니다</b>.
+</div></div>
+<div id="view" style="display:none"><span class="back" onclick="home()">← 목록으로</span>
+<iframe id="f0" class="frame" style="display:none" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;TactFlow · AI 개발 안전조치 자체점검 (PIPC 2024.7)&lt;/title&gt;
+&lt;style&gt;
+:root{--ink:#1b1b1f;--muted:#6b6b76;--line:#e3e3e8;--bg:#fbfbfd;--ok:#0a7d4f;--warn:#a86600;--no:#b23b3b;--acc:#2b4fbd}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{padding:20px 14px 64px;font:15px/1.65 -apple-system,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto}
+h1{font-size:19px;margin:0 0 4px;letter-spacing:-.2px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.card&gt;h2{font-size:14px;margin:0 0 12px;color:var(--acc);font-weight:600;line-height:1.4}
+
+.tip{font-size:12.5px;line-height:1.7;color:#7a5600;background:#fff8e6;border:1px solid #f0dfae;border-radius:8px;padding:10px 12px;margin:0 0 14px}
+
+.tbox{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;min-width:560px;border-collapse:collapse;font-size:13.5px;table-layout:fixed}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle;word-break:break-word}
+th{font-weight:600;color:var(--muted);font-size:12px;white-space:nowrap}
+th:nth-child(1),td:nth-child(1){width:42px;text-align:center;color:var(--muted)}
+th:nth-child(3),td:nth-child(3){width:76px}
+th:nth-child(4),td:nth-child(4){width:150px}
+tbody tr:last-child td{border-bottom:none}
+
+.sec{font-size:11px;color:var(--muted);background:#f7f7fa;padding:7px 10px;border-bottom:1px solid var(--line)}
+
+.opts{display:flex;gap:5px;justify-content:flex-end;white-space:nowrap}
+.opts label{display:inline-block;cursor:pointer;margin:0}
+.opts input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.opts span{display:inline-block;width:31px;text-align:center;padding:4px 0;border:1px solid var(--line);border-radius:6px;font-size:12.5px;color:var(--muted);background:#fff}
+.opts input:checked+span{border-color:var(--acc);color:#fff;background:var(--acc)}
+
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
+.bar&gt;div{flex:1;min-width:130px;background:#f7f7fa;border-radius:8px;padding:10px 12px}
+.bar b{font-size:20px;display:block;line-height:1.25;margin-top:2px}
+.bar small{color:var(--muted);font-size:12px}
+
+.note{font-size:12.5px;line-height:1.75;color:var(--muted);background:#f7f7fa;border-radius:8px;padding:10px 12px;margin:12px 0 0}
+
+.dis{font-size:12.5px;line-height:1.9;color:var(--muted)}
+.dis p{margin:0 0 8px}
+.dis p:last-child{margin-bottom:0}
+.dis b{color:var(--ink)}
+
+.btn{margin-top:12px;padding:9px 16px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-size:13.5px;cursor:pointer}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+&lt;h1&gt;AI 개발 안전조치 자체점검&lt;/h1&gt;
+&lt;p class=&quot;sub&quot;&gt;PIPC「AI 개발·서비스를 위한 공개된 개인정보 처리 안내서」2024.7 · 본문 1-1～2-4 · 12개 항목&lt;/p&gt;
+
+&lt;div class=&quot;tip&quot;&gt;&lt;b&gt;원문은 &#x27;권고&#x27;입니다.&lt;/b&gt; 이 안내서는 p.2에 「법적 구속력이 없음」을 명시하고 있으며, 각 항목은 「권고사항」「바람직함」「권장됨」으로 기술되어 있습니다. &lt;b&gt;법적 의무가 아닙니다.&lt;/b&gt;&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;점검 항목&lt;/h2&gt;
+  &lt;div class=&quot;tbox&quot;&gt;
+    &lt;table id=&quot;tbl&quot;&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;#&lt;/th&gt;&lt;th&gt;점검항목 / 세부기준&lt;/th&gt;&lt;th&gt;원문&lt;/th&gt;&lt;th style=&quot;text-align:right&quot;&gt;√ △ ✕ —&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;결과&lt;/h2&gt;
+  &lt;div class=&quot;bar&quot;&gt;
+    &lt;div&gt;&lt;small&gt;기술적 (8)&lt;/small&gt;&lt;b id=&quot;s-tech&quot;&gt;0 / 8&lt;/b&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;small&gt;관리적 (4)&lt;/small&gt;&lt;b id=&quot;s-mgmt&quot;&gt;0 / 4&lt;/b&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;small&gt;미시행&lt;/small&gt;&lt;b id=&quot;s-x&quot;&gt;0 건&lt;/b&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;p class=&quot;note&quot;&gt;기술과 관리 점수를 합산하지 않습니다. 관리 항목이 비어 있는데 기술 점수로 가려지는 것을 막기 위함입니다.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;판정하지 않는 것&lt;/h2&gt;
+  &lt;div class=&quot;dis&quot;&gt;
+    &lt;p&gt;&lt;b&gt;본 도구는 점검표입니다.&lt;/b&gt; 항목의 체크 결과를 집계할 뿐, &lt;b&gt;법률 의견이나 적법성 판단을 제공하지 않습니다.&lt;/b&gt;&lt;/p&gt;
+    &lt;p&gt;원문이 &#x27;권고&#x27;인 이상, 미이행 항목이 곧 위법을 의미하지도 않습니다.&lt;/p&gt;
+    &lt;p&gt;표시된 원문 위치를 근거로 개별 판단은 변호사가 수행합니다.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;button class=&quot;btn&quot; onclick=&quot;exportCSV()&quot;&gt;CSV 저장&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const ITEMS=[
+ {s:&quot;기술적&quot;},
+ {n:&quot;1-1&quot;,t:&quot;학습데이터 수집 출처 검증·관리 — 로봇배제표준(robots.txt) 준수&quot;,p:&quot;p.17-18&quot;,k:&quot;tech&quot;},
+ {n:&quot;1-1&quot;,t:&quot;학습데이터 수집 출처 검증·관리 — 개인정보 집적 도메인 배제&quot;,p:&quot;p.18&quot;,k:&quot;tech&quot;},
+ {n:&quot;1-2&quot;,t:&quot;개인정보 유·노출 방지 — 개인 식별자 삭제&quot;,p:&quot;p.19-20&quot;,k:&quot;tech&quot;},
+ {n:&quot;1-2&quot;,t:&quot;개인정보 유·노출 방지 — 중복 제거&quot;,p:&quot;p.19-20&quot;,k:&quot;tech&quot;},
+ {n:&quot;1-3&quot;,t:&quot;개인정보의 안전한 저장 및 관리 — 접근 통제&quot;,p:&quot;p.21&quot;,k:&quot;tech&quot;},
+ {n:&quot;1-4&quot;,t:&quot;미세조정을 통한 안전장치 추가 — 사생활 관련 답변 거부 미세조정&quot;,p:&quot;p.21-23&quot;,k:&quot;tech&quot;},
+ {n:&quot;1-5&quot;,t:&quot;프롬프트 및 출력 필터링 — 프롬프트 조치·출력 필터&quot;,p:&quot;p.24&quot;,k:&quot;tech&quot;},
+ {n:&quot;1-6&quot;,t:&quot;학습 결과에서 특정 데이터 삭제 — 머신 언러닝(machine unlearning)&quot;,p:&quot;p.25&quot;,k:&quot;tech&quot;},
+ {s:&quot;관리적&quot;},
+ {n:&quot;2-1&quot;,t:&quot;학습데이터 처리기준 정립 및 처리방침 공개&quot;,p:&quot;p.26&quot;,k:&quot;mgmt&quot;},
+ {n:&quot;2-2&quot;,t:&quot;개인정보 영향평가 수행 고려&quot;,p:&quot;p.26&quot;,k:&quot;mgmt&quot;},
+ {n:&quot;2-3&quot;,t:&quot;(가칭) AI 프라이버시 레드팀 구성·운영&quot;,p:&quot;p.27&quot;,k:&quot;mgmt&quot;},
+ {n:&quot;2-4&quot;,t:&quot;오픈소스·API 등 AI 개발·배포 특성에 따른 안전조치&quot;,p:&quot;p.28&quot;,k:&quot;mgmt&quot;}
+];
+const tb=document.querySelector(&#x27;#tbl tbody&#x27;);
+let idx=0;
+ITEMS.forEach(it=&gt;{
+  if(it.s){const tr=document.createElement(&#x27;tr&#x27;);tr.innerHTML=`&lt;td colspan=&quot;4&quot; class=&quot;sec&quot;&gt;${it.s}&lt;/td&gt;`;tb.appendChild(tr);return;}
+  idx++;
+  const tr=document.createElement(&#x27;tr&#x27;);
+  tr.innerHTML=`&lt;td&gt;${idx}&lt;/td&gt;&lt;td&gt;${it.t}&lt;/td&gt;&lt;td style=&quot;color:var(--muted);font-size:12px&quot;&gt;${it.p}&lt;/td&gt;
+  &lt;td&gt;&lt;div class=&quot;opts&quot;&gt;
+    ${[&#x27;√&#x27;,&#x27;△&#x27;,&#x27;✕&#x27;,&#x27;—&#x27;].map(v=&gt;`&lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;q${idx}&quot; value=&quot;${v}&quot; data-k=&quot;${it.k}&quot; onchange=&quot;calc()&quot;&gt;&lt;span&gt;${v}&lt;/span&gt;&lt;/label&gt;`).join(&#x27;&#x27;)}
+  &lt;/div&gt;&lt;/td&gt;`;
+  tb.appendChild(tr);
+});
+function calc(){
+  let tech=0,mgmt=0,x=0;
+  document.querySelectorAll(&#x27;input[type=radio]:checked&#x27;).forEach(el=&gt;{
+    if(el.value===&#x27;√&#x27;){el.dataset.k===&#x27;tech&#x27;?tech++:mgmt++;}
+    if(el.value===&#x27;✕&#x27;)x++;
+  });
+  document.getElementById(&#x27;s-tech&#x27;).textContent=tech+&#x27; / 8&#x27;;
+  document.getElementById(&#x27;s-mgmt&#x27;).textContent=mgmt+&#x27; / 4&#x27;;
+  document.getElementById(&#x27;s-x&#x27;).textContent=x+&#x27; 건&#x27;;
+}
+function exportCSV(){
+  let rows=[[&#x27;번호&#x27;,&#x27;항목&#x27;,&#x27;원문위치&#x27;,&#x27;응답&#x27;]];
+  document.querySelectorAll(&#x27;#tbl tbody tr&#x27;).forEach(tr=&gt;{
+    const tds=tr.querySelectorAll(&#x27;td&#x27;);
+    if(tds.length&lt;4)return;
+    const radio=tr.querySelector(&#x27;input:checked&#x27;);
+    rows.push([tds[0].textContent,tds[1].textContent,tds[2].textContent,radio?radio.value:&#x27;&#x27;]);
+  });
+  const csv=&#x27;\ufeff&#x27;+rows.map(r=&gt;r.map(c=&gt;&#x27;&quot;&#x27;+String(c).replace(/&quot;/g,&#x27;&quot;&quot;&#x27;)+&#x27;&quot;&#x27;).join(&#x27;,&#x27;)).join(&#x27;\n&#x27;);
+  const a=document.createElement(&#x27;a&#x27;);
+  a.href=URL.createObjectURL(new Blob([csv],{type:&#x27;text/csv&#x27;}));
+  a.download=&#x27;tactflow_ai_safeguard_check.csv&#x27;;a.click();
+}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+<iframe id="f1" class="frame" style="display:none" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;TactFlow · 과징금 투자감경 증빙 점검&lt;/title&gt;
+&lt;style&gt;
+:root{--ink:#1b1b1f;--muted:#6b6b76;--line:#e3e3e8;--bg:#fbfbfd;--acc:#2b4fbd}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{padding:20px 14px 64px;font:15px/1.65 -apple-system,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:19px;margin:0 0 4px;letter-spacing:-.2px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px;line-height:1.6}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.card&gt;h2{font-size:14px;margin:0 0 12px;color:var(--acc);font-weight:600;line-height:1.4}
+
+.tip{font-size:12.5px;line-height:1.75;color:#7a5600;background:#fff8e6;border:1px solid #f0dfae;border-radius:8px;padding:10px 12px;margin:0 0 14px}
+
+.tbox{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;min-width:540px;border-collapse:collapse;font-size:13.5px;table-layout:fixed}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle;word-break:break-word}
+th{font-weight:600;color:var(--muted);font-size:12px;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+
+.num{width:100%;max-width:150px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-size:13.5px;text-align:right}
+.sel{width:100%;max-width:210px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-size:13.5px}
+input[type=checkbox]{width:17px;height:17px;margin:0}
+td.c{text-align:center}
+
+.res{font-size:22px;font-weight:600;color:var(--acc);margin:4px 0 2px;line-height:1.3}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:var(--muted);word-break:break-all}
+.note{font-size:12.5px;line-height:1.75;color:var(--muted);background:#f7f7fa;border-radius:8px;padding:10px 12px;margin:12px 0 0}
+
+.dis{font-size:12.5px;line-height:1.9;color:var(--muted)}
+.dis p{margin:0 0 8px}
+.dis p:last-child{margin-bottom:0}
+.dis b{color:var(--ink)}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+&lt;h1&gt;과징금 투자감경 증빙 점검&lt;/h1&gt;
+&lt;p class=&quot;sub&quot;&gt;근거: 개인정보 보호법 제64조의2⑥ · 시행령 [별표 1의5] · 고시 제2026-12호 제8조의3 · PIPC 안내서(2026.9)&lt;/p&gt;
+
+&lt;div class=&quot;tip&quot;&gt;&lt;b&gt;감경은 &quot;산정&quot;이 아니라 &quot;판단&quot;입니다.&lt;/b&gt; 고시 제8조의3은 「종합적으로 고려하여 … 100분의 40 이하」로 규정하고 있으며, PIPC도 「숫자 하나로 딱 나오기가 상당히 힘들다」고 밝힌 바 있습니다. 본 도구는 &lt;b&gt;증빙 요건의 충족 여부와 산술 과정&lt;/b&gt;만 제시합니다.&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;1. 기준금액 산정 (법 제64조의2①, 별표 1의5 가목)&lt;/h2&gt;
+  &lt;div class=&quot;tbox&quot;&gt;
+    &lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;항목&lt;/th&gt;&lt;th style=&quot;text-align:right;width:190px&quot;&gt;금액 / 선택&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;&lt;td&gt;전체 매출액&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;&lt;input class=&quot;num&quot; type=&quot;number&quot; id=&quot;rev&quot; placeholder=&quot;0&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;위반행위와 관련 없는 매출액（차감）&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;&lt;input class=&quot;num&quot; type=&quot;number&quot; id=&quot;unrel&quot; placeholder=&quot;0&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;부과기준율（중대성 등급）&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;
+          &lt;select class=&quot;sel&quot; id=&quot;rate&quot;&gt;
+            &lt;option value=&quot;0&quot;&gt;— 선택 —&lt;/option&gt;
+            &lt;option value=&quot;0.024&quot;&gt;매우 중대 (2.1~2.7%)&lt;/option&gt;
+            &lt;option value=&quot;0.018&quot;&gt;중대 (1.5~2.1%)&lt;/option&gt;
+            &lt;option value=&quot;0.012&quot;&gt;보통 (0.9~1.5%)&lt;/option&gt;
+            &lt;option value=&quot;0.005&quot;&gt;약함 (0.03~0.9%)&lt;/option&gt;
+          &lt;/select&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;p class=&quot;note&quot;&gt;등급 판단은 [별표 1] 기준에 따르며, &lt;b&gt;본 도구는 등급을 판단하지 않습니다.&lt;/b&gt; 해당 등급을 선택하는 것은 변호사/위원회의 판단입니다.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;2. 증빙 8종 체크（PIPC 안내서）&lt;/h2&gt;
+  &lt;div class=&quot;tbox&quot;&gt;
+    &lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th style=&quot;width:44px&quot;&gt;✓&lt;/th&gt;&lt;th&gt;증빙&lt;/th&gt;&lt;th&gt;요점&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;별도(개별) 감사보고서&lt;/td&gt;&lt;td&gt;매출액 기준 자료&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;합계잔액시산표&lt;/td&gt;&lt;td&gt;계정과목 확인&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;자산대장&lt;/b&gt;&lt;/td&gt;&lt;td&gt;IT투자액·개인정보투자액 해당여부 표시&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;비용원장&lt;/b&gt;&lt;/td&gt;&lt;td&gt;동일 3열 표시&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;인건비 내역·급여대장·&lt;b&gt;업무기술서&lt;/b&gt;·채용공고&lt;/td&gt;&lt;td&gt;전담성 입증&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;예산서·기안서·품의서·지출증빙&lt;/td&gt;&lt;td&gt;집행 증빙&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;6개 지표 산출표&lt;/td&gt;&lt;td&gt;아래 3항에서 자동 산출&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td class=&quot;c&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;ev&quot;&gt;&lt;/td&gt;&lt;td&gt;3개 사업연도 추이&lt;/td&gt;&lt;td&gt;지속성 입증&lt;/td&gt;&lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;res&quot; id=&quot;evres&quot;&gt;0 / 8&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;3. 지표 산출（아래 5개 항목）&lt;/h2&gt;
+  &lt;div class=&quot;tbox&quot;&gt;
+    &lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;항목&lt;/th&gt;&lt;th style=&quot;text-align:right;width:150px&quot;&gt;값&lt;/th&gt;&lt;th style=&quot;width:210px&quot;&gt;산출&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;&lt;td&gt;개인정보 보호 예산&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;&lt;input class=&quot;num&quot; type=&quot;number&quot; id=&quot;b1&quot; placeholder=&quot;0&quot;&gt;&lt;/td&gt;&lt;td class=&quot;mono&quot; id=&quot;o-b1&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;실제 집행액&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;&lt;input class=&quot;num&quot; type=&quot;number&quot; id=&quot;b2&quot; placeholder=&quot;0&quot;&gt;&lt;/td&gt;&lt;td class=&quot;mono&quot; id=&quot;o-b2&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;IT 투자액（정보보호 공시 기준）&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;&lt;input class=&quot;num&quot; type=&quot;number&quot; id=&quot;b3&quot; placeholder=&quot;0&quot;&gt;&lt;/td&gt;&lt;td class=&quot;mono&quot; id=&quot;o-b3&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;매출액 대비 개인정보 투자 비율&lt;/td&gt;&lt;td style=&quot;text-align:right;color:var(--muted)&quot;&gt;자동&lt;/td&gt;&lt;td class=&quot;mono&quot; id=&quot;o-b4&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;신규 투자액（3년 중 신규）&lt;/td&gt;&lt;td style=&quot;text-align:right&quot;&gt;&lt;input class=&quot;num&quot; type=&quot;number&quot; id=&quot;b5&quot; placeholder=&quot;0&quot;&gt;&lt;/td&gt;&lt;td class=&quot;mono&quot; id=&quot;o-b5&quot;&gt;—&lt;/td&gt;&lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;p class=&quot;note&quot;&gt;비율이 낮다·높다의 판단은 하지 않습니다. 산출값만 제시하며, 업종·규모별 비교는 「업종별 특성 등을 고려한 비교는 향후 공시제도 개선 등을 토대로 검토 예정」(안내서)이라는 원문 입장을 따릅니다.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;4. 산술（감경 미적용 시 기준금액까지）&lt;/h2&gt;
+  &lt;div class=&quot;res&quot; id=&quot;base&quot;&gt;—&lt;/div&gt;
+  &lt;div class=&quot;mono&quot; id=&quot;step&quot;&gt;&lt;/div&gt;
+  &lt;p class=&quot;note&quot;&gt;투자감경(≤40%)·1차(±90%)·2차(±50%)·최종(±90%)의 각 단계는 &lt;b&gt;위원회의 종합적 고려&lt;/b&gt;로 정해지므로, 본 도구는 계산하지 않습니다. 기준금액까지만 제시합니다.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;면책&lt;/h2&gt;
+  &lt;div class=&quot;dis&quot;&gt;
+    &lt;p&gt;본 도구는 &lt;b&gt;증빙 요건의 충족 여부와 단순 산술&lt;/b&gt;만 제공합니다. &lt;b&gt;법률 의견이 아니며, 감경액을 예측하지 않습니다.&lt;/b&gt;&lt;/p&gt;
+    &lt;p&gt;중대성 등급 및 감경률은 위원회 재량 사항이며(고시 제8조의3, 제10조의2), 본 도구는 이에 대한 의견을 제시하지 않습니다.&lt;/p&gt;
+    &lt;p&gt;증빙 요건은 PIPC「과징금 투자 감경제도 안내서」(2026.9) 기준이며, 각 증빙 항목의 &lt;b&gt;존재 여부·기재 항목 충족 여부·산출 근거 제시 여부&lt;/b&gt;의 3단으로 확인하도록 설계되어 있습니다. &lt;b&gt;이 기준은 축약하지 않습니다.&lt;/b&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const n=id=&gt;parseFloat(document.getElementById(id).value)||0;
+const fm=v=&gt;v.toLocaleString(&#x27;ko-KR&#x27;)+&#x27;원&#x27;;
+function calc(){
+  const ev=[...document.querySelectorAll(&#x27;.ev&#x27;)].filter(e=&gt;e.checked).length;
+  document.getElementById(&#x27;evres&#x27;).textContent=ev+&#x27; / 8&#x27;;
+
+  const rev=n(&#x27;rev&#x27;), un=n(&#x27;unrel&#x27;), rate=parseFloat(document.getElementById(&#x27;rate&#x27;).value)||0;
+  const baseEl=document.getElementById(&#x27;base&#x27;), stepEl=document.getElementById(&#x27;step&#x27;);
+  if(rev&lt;0||un&lt;0){
+    baseEl.textContent=&#x27;—&#x27;;
+    stepEl.textContent=&#x27;⚠️ 음수는 입력할 수 없습니다. 금액을 다시 확인하세요.&#x27;;
+  }else if(un&gt;rev){
+    baseEl.textContent=&#x27;—&#x27;;
+    stepEl.textContent=&#x27;⚠️ 위반행위와 관련 없는 매출액이 전체 매출액보다 큽니다. 입력을 확인하세요. (자동으로 0 처리하지 않습니다)&#x27;;
+  }else if(rev&gt;0&amp;&amp;rate&gt;0){
+    const rel=rev-un, base=rel*rate;
+    baseEl.textContent=fm(base);
+    stepEl.textContent=`(${fm(rev)} − ${fm(un)}) × ${(rate*100).toFixed(1)}% = ${fm(base)}`;
+  }else{
+    baseEl.textContent=&#x27;—&#x27;;
+    stepEl.textContent=&#x27;매출액과 부과기준율을 입력하세요.&#x27;;
+  }
+
+  const b1=n(&#x27;b1&#x27;),b2=n(&#x27;b2&#x27;),b3=n(&#x27;b3&#x27;),b5=n(&#x27;b5&#x27;);
+  document.getElementById(&#x27;o-b1&#x27;).textContent = b1?fm(b1):&#x27;—&#x27;;
+  document.getElementById(&#x27;o-b2&#x27;).textContent = b2?fm(b2):&#x27;—&#x27;;
+  document.getElementById(&#x27;o-b3&#x27;).textContent = b3?fm(b3):&#x27;—&#x27;;
+  document.getElementById(&#x27;o-b4&#x27;).textContent =
+    (b2&amp;&amp;b3) ? `${(b2/b3*100).toFixed(2)}% (IT 대비)${rev?` · ${(b2/rev*100).toFixed(2)}% (매출 대비)`:&#x27;&#x27;}` : &#x27;—&#x27;;
+  document.getElementById(&#x27;o-b5&#x27;).textContent = b5?fm(b5):&#x27;—&#x27;;
+}
+document.addEventListener(&#x27;input&#x27;,calc);
+document.addEventListener(&#x27;change&#x27;,calc);
+calc();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+<iframe id="f2" class="frame" style="display:none" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;TactFlow · 개인정보 항목 탐지&lt;/title&gt;
+&lt;style&gt;
+:root{--ink:#1b1b1f;--muted:#6b6b76;--line:#e3e3e8;--bg:#fbfbfd;--acc:#2b4fbd}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{padding:20px 14px 64px;font:15px/1.65 -apple-system,&quot;Apple SD Gothic Neo&quot;,&quot;Malgun Gothic&quot;,system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:20px;margin:0 0 4px;letter-spacing:-.2px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+
+/* 统一卡片：内部一律 16px，子元素不再自带外边框 */
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.card&gt;h2{font-size:14px;margin:0 0 12px;color:var(--acc);font-weight:600;line-height:1.4}
+
+/* 提示条：单一边框、单一边距，不再嵌套卡片 */
+.tip{font-size:12.5px;line-height:1.7;color:#7a5600;background:#fff8e6;border:1px solid #f0dfae;border-radius:8px;padding:10px 12px;margin:0 0 14px}
+
+/* 拖放区：去掉与外卡的“双框”，仅虚线内框 */
+.drop{display:block;border:1.5px dashed var(--line);border-radius:8px;padding:26px 14px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.7;cursor:pointer;background:#fcfcfe}
+.drop:hover,.drop.on{border-color:var(--acc);color:var(--acc);background:#f7f9ff}
+.drop small{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+
+/* 说明文字：不再用 border-left（容易与表格线视觉冲突），改为圆角浅底 */
+.note{font-size:12.5px;line-height:1.75;color:var(--muted);background:#f7f7fa;border-radius:8px;padding:10px 12px;margin:12px 0 0}
+
+/* 表格：移动端可横向滚动，避免挤压错行 */
+.tbox{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:4px}
+table{width:100%;min-width:520px;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle;word-break:break-all}
+th{font-weight:600;color:var(--muted);font-size:12px;white-space:nowrap}
+th:nth-child(1),td:nth-child(1){width:56px}
+th:nth-child(2),td:nth-child(2){width:auto}
+th:nth-child(3),td:nth-child(3){width:70px}
+th:nth-child(4),td:nth-child(4){width:56px}
+th:nth-child(5),td:nth-child(5){width:140px}
+tbody tr:last-child td{border-bottom:none}
+
+.sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:#eef1fb;color:var(--acc);border-radius:20px;padding:4px 12px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.chip z{font-weight:400;color:var(--muted);font-style:normal}
+
+.btn{padding:8px 16px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-size:13.5px;cursor:pointer;margin-top:12px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+
+.dis{font-size:12.5px;line-height:1.9;color:var(--muted)}
+.dis b{color:var(--ink)}
+.dis p{margin:0 0 8px}
+.dis p:last-child{margin-bottom:0}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+&lt;h1&gt;개인정보 항목 탐지&lt;/h1&gt;
+&lt;p class=&quot;sub&quot;&gt;PIPC「홈페이지 개인정보 노출방지 안내서」(2024.4) 8종 정규표현식 기준&lt;/p&gt;
+
+&lt;div class=&quot;tip&quot;&gt;&lt;b&gt;이 도구는 파일을 서버로 전송하지 않습니다.&lt;/b&gt; 파일 선택은 가능하지만, 모든 처리는 브라우저 안에서만 이루어지며 어떤 데이터도 외부로 나가지 않습니다.&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;1. 파일 선택（CSV / TXT）&lt;/h2&gt;
+  &lt;label class=&quot;drop&quot; id=&quot;drop&quot; for=&quot;file&quot;&gt;
+    여기를 눌러 파일을 선택하거나, 파일을 끌어다 놓으세요
+    &lt;small&gt;CSV · TXT · 최대 5MB&lt;/small&gt;
+  &lt;/label&gt;
+  &lt;input type=&quot;file&quot; id=&quot;file&quot; accept=&quot;.csv,.txt,text/plain,text/csv&quot;&gt;
+  &lt;p class=&quot;note&quot;&gt;CSV는 모든 셀을, TXT는 모든 줄을 검사합니다. &lt;b&gt;원문은 화면에 표시되지 않습니다&lt;/b&gt;（앞 3자리·뒤 2자리만 남긴 마스킹 예시만 표시）.&lt;/p&gt;
+  &lt;label style=&quot;display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:var(--muted)&quot;&gt;
+    &lt;input type=&quot;checkbox&quot; id=&quot;rough&quot;&gt; 계좌번호 등 &#x27;수동확인&#x27; 항목도 포함
+    &lt;span style=&quot;font-size:11.5px&quot;&gt;（기본 미포함 — 실제 텍스트 419건 회귀에서 오탐 다수 확인）&lt;/span&gt;
+  &lt;/label&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot; id=&quot;resCard&quot; style=&quot;display:none&quot;&gt;
+  &lt;h2&gt;2. 탐지 결과&lt;/h2&gt;
+  &lt;div class=&quot;sum&quot; id=&quot;sum&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;tbox&quot;&gt;
+    &lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;행&lt;/th&gt;&lt;th&gt;유형&lt;/th&gt;&lt;th&gt;위치&lt;/th&gt;&lt;th&gt;길이&lt;/th&gt;&lt;th&gt;마스킹 예시&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody id=&quot;tb&quot;&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;p class=&quot;note&quot; id=&quot;foot&quot;&gt;&lt;/p&gt;
+  &lt;button class=&quot;btn&quot; onclick=&quot;download()&quot;&gt;CSV 저장&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+  &lt;h2&gt;판정하지 않는 것&lt;/h2&gt;
+  &lt;div class=&quot;dis&quot;&gt;
+    &lt;p&gt;&lt;b&gt;이 도구는 &#x27;탐지&#x27;만 합니다.&lt;/b&gt; 탐지된 항목이 곧 위법은 아닙니다 — 주민등록번호가 인사기록에 있는 것은 정상이고, 공개된 홈페이지에 있는 경우에 문제가 될 수 있습니다.&lt;/p&gt;
+    &lt;p&gt;&lt;b&gt;개인정보 해당 여부, 위법 여부, 처리의 적법성은 판단하지 않습니다.&lt;/b&gt; 해당 판단은 변호사가 수행합니다.&lt;/p&gt;
+    &lt;p&gt;정규표현식은 PIPC 안내서 기준이나, &lt;b&gt;오탐(false positive)과 미탐(false negative)이 모두 발생할 수 있습니다.&lt;/b&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const P=[
+ {n:&quot;주민등록번호&quot;, r:/(\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])-?([1-4]\d{6})/g},
+ {n:&quot;외국인등록번호&quot;, r:/(\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])-?([5-8]\d{6})/g},
+ {n:&quot;운전면허번호&quot;, r:/(\d{2})[-](\d{2})[-](\d{6})[-](\d{2})/g},
+ {n:&quot;여권번호(신)&quot;, r:/([A-Za-z]{1,2})(\d{3})([A-Za-z])(\d{4})/g},
+ {n:&quot;여권번호(구)&quot;, r:/([A-Za-z]{1,2})(\d{8})/g},
+ {n:&quot;신용카드번호&quot;, r:/(\d{4})[- ,]?(\d{4})[- ,]?(\d{4})[- ,]?(\d{4})/g},
+ {n:&quot;휴대전화번호&quot;, r:/(01[016789])[- ]?(\d{3,4})[- ]?(\d{4})/g},
+ {n:&quot;계좌번호(수동확인)&quot;, r:/(\d{3,6})[-](\d{2,6})[-](\d{4,8})/g}
+];
+const PRIO=[&quot;주민등록번호&quot;,&quot;외국인등록번호&quot;,&quot;운전면허번호&quot;,&quot;여권번호(신)&quot;,&quot;여권번호(구)&quot;,&quot;신용카드번호&quot;,&quot;휴대전화번호&quot;,&quot;계좌번호(수동확인)&quot;];
+function mask(s){ if(s.length&lt;=5) return s[0]+&quot;*&quot;.repeat(s.length-1); return s.slice(0,3)+&quot;*&quot;.repeat(s.length-5)+s.slice(-2); }
+
+let rowsOut=[];
+const ROUGH=&quot;계좌번호(수동확인)&quot;;
+let WR=false;   // 수동확인 항목 포함 여부（기본 false — 실제 텍스트 419건 회귀에서 오탐 다수 확인）
+function scan(text,rowIdx,withRough){
+  if(withRough===undefined) withRough=WR;
+  let taken=[],hits=[];
+  for(const name of PRIO){
+    if(name===ROUGH &amp;&amp; !withRough) continue;
+    const p=P.find(x=&gt;x.n===name); p.r.lastIndex=0; let m;
+    while((m=p.r.exec(text))!==null){
+      const s=m.index,e=s+m[0].length;
+      if(taken.some(t=&gt;s&lt;t[1]&amp;&amp;e&gt;t[0])){ if(m[0].length===0)p.r.lastIndex++; continue; }
+      taken.push([s,e]);
+      hits.push({row:rowIdx,type:name,pos:s,len:e-s,mask:mask(m[0])});
+      if(m[0].length===0) p.r.lastIndex++;
+    }
+  }
+  return hits;
+}
+function parseCSVLine(line){
+  const out=[];let cur=&#x27;&#x27;,q=false;
+  for(let i=0;i&lt;line.length;i++){const c=line[i];
+    if(q){ if(c===&#x27;&quot;&#x27;){ if(line[i+1]===&#x27;&quot;&#x27;){cur+=&#x27;&quot;&#x27;;i++;} else q=false; } else cur+=c; }
+    else { if(c===&#x27;&quot;&#x27;) q=true; else if(c===&#x27;,&#x27;){out.push(cur);cur=&#x27;&#x27;;} else cur+=c; }
+  }
+  out.push(cur);return out;
+}
+function handle(file){
+  if(file.size&gt;5*1024*1024){alert(&quot;5MB를 초과합니다.&quot;);return;}
+  const rd=new FileReader();
+  rd.onload=e=&gt;{
+    // 전각 숫자·전각 하이픈을 반각으로 정규화 (Davos 碰撞测试 2026-10-20 发现：JS \d 不匹配全角)
+    const raw0=e.target.result;
+    const text=raw0.replace(/[\uFF10-\uFF19]/g,c=&gt;String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+                  .replace(/[\uFF0D\u2010-\u2015\u2212]/g,&quot;-&quot;);
+    const isCSV=/\.csv$/i.test(file.name);
+    let all=[];
+    if(isCSV){
+      text.split(/\r?\n/).forEach((line,i)=&gt;{
+        if(!line.trim())return;
+        parseCSVLine(line).forEach(cell=&gt;{ if(cell.trim()) all=all.concat(scan(cell,i+1)); });
+      });
+    }else{
+      text.split(/\r?\n/).forEach((line,i)=&gt;{ if(line.trim()) all=all.concat(scan(line,i+1)); });
+    }
+    render(all,file.name);
+  };
+  rd.readAsText(file,&quot;utf-8&quot;);
+}
+function render(hits,fname){
+  rowsOut=hits;
+  document.getElementById(&#x27;resCard&#x27;).style.display=&#x27;block&#x27;;
+  const c={}; hits.forEach(h=&gt;c[h.type]=(c[h.type]||0)+1);
+  document.getElementById(&#x27;sum&#x27;).innerHTML =
+    `&lt;span class=&quot;chip&quot;&gt;총 ${hits.length}건 &lt;z&gt;· ${fname}&lt;/z&gt;&lt;/span&gt;` +
+    Object.entries(c).sort((a,b)=&gt;b[1]-a[1]).map(([k,v])=&gt;`&lt;span class=&quot;chip&quot;&gt;${k} ${v}&lt;/span&gt;`).join(&#x27;&#x27;);
+  const tb=document.getElementById(&#x27;tb&#x27;);
+  tb.innerHTML = hits.slice(0,300).map(h=&gt;
+      `&lt;tr&gt;&lt;td&gt;${h.row}&lt;/td&gt;&lt;td&gt;${h.type}&lt;/td&gt;&lt;td class=&quot;mono&quot;&gt;${h.pos}&lt;/td&gt;&lt;td&gt;${h.len}&lt;/td&gt;&lt;td class=&quot;mono&quot;&gt;${h.mask}&lt;/td&gt;&lt;/tr&gt;`
+    ).join(&#x27;&#x27;) || `&lt;tr&gt;&lt;td colspan=&quot;5&quot; style=&quot;color:var(--muted)&quot;&gt;탐지된 항목이 없습니다.&lt;/td&gt;&lt;/tr&gt;`;
+  document.getElementById(&#x27;foot&#x27;).textContent =
+    hits.length&gt;300 ? `전체 ${hits.length}건 중 300건만 표시합니다.` :
+    (hits.length? &#x27;원문은 표시하지 않으며, 앞 3자리·뒤 2자리만 남긴 마스킹 예시입니다.&#x27; : &#x27;&#x27;);
+}
+function download(){
+  let csv=&#x27;\ufeff행,유형,위치,길이,마스킹예시\n&#x27;;
+  rowsOut.forEach(h=&gt;{csv+=`${h.row},&quot;${h.type}&quot;,${h.pos},${h.len},&quot;${h.mask}&quot;\n`;});
+  const a=document.createElement(&#x27;a&#x27;);
+  a.href=URL.createObjectURL(new Blob([csv],{type:&#x27;text/csv&#x27;}));
+  a.download=&#x27;pi_scan_report.csv&#x27;;a.click();
+}
+const drop=document.getElementById(&#x27;drop&#x27;),inp=document.getElementById(&#x27;file&#x27;);
+const roughBox=document.getElementById(&#x27;rough&#x27;);
+if(roughBox){ roughBox.addEventListener(&#x27;change&#x27;,e=&gt;{
+  WR=e.target.checked;
+  if(inp.files&amp;&amp;inp.files[0]) handle(inp.files[0]);
+}); }
+inp.addEventListener(&#x27;change&#x27;,e=&gt;{ if(e.target.files[0]) handle(e.target.files[0]); });
+[&#x27;dragover&#x27;,&#x27;dragenter&#x27;].forEach(k=&gt;drop.addEventListener(k,e=&gt;{e.preventDefault();drop.classList.add(&#x27;on&#x27;);}));
+[&#x27;dragleave&#x27;,&#x27;drop&#x27;].forEach(k=&gt;drop.addEventListener(k,e=&gt;{e.preventDefault();drop.classList.remove(&#x27;on&#x27;);}));
+drop.addEventListener(&#x27;drop&#x27;,e=&gt;{ const f=e.dataTransfer.files[0]; if(f) handle(f); });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></div></div>
+<script>
+function show(i){document.getElementById('home').style.display='none';document.getElementById('view').style.display='block';document.querySelectorAll('.frame').forEach((f,k)=>{f.style.display=(k===i?'block':'none');});window.scrollTo(0,0);}
+function home(){document.getElementById('view').style.display='none';document.getElementById('home').style.display='block';window.scrollTo(0,0);}
+</script></body></html>
